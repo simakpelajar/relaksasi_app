@@ -34,6 +34,19 @@ class _AddJournalScreenState extends State<AddJournalScreen> {
     if (widget.journal != null) {
       _contentController.text = widget.journal!.content;
       _selectedMood = widget.journal!.mood;
+      try {
+        // Try to parse the date if it's in the expected format
+        final dateParts = widget.journal!.date.split('/');
+        if (dateParts.length == 3) {
+          final day = int.parse(dateParts[0]);
+          final month = int.parse(dateParts[1]);
+          final year = int.parse(dateParts[2]);
+          _selectedDate = DateTime(year, month, day);
+        }
+      } catch (e) {
+        // If date parsing fails, keep the default (today)
+        debugPrint('Error parsing date: $e');
+      }
     }
   }
 
@@ -42,6 +55,8 @@ class _AddJournalScreenState extends State<AddJournalScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Silakan tulis catatan Anda'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.redAccent,
         ),
       );
       return;
@@ -55,7 +70,7 @@ class _AddJournalScreenState extends State<AddJournalScreen> {
       final journal = Journal(
         id: widget.journal?.id,
         date: DateFormatter.formatDate(_selectedDate),
-        mood: _selectedMood, // Langsung gunakan mood bahasa Indonesia
+        mood: _selectedMood,
         content: _contentController.text,
         createdAt: DateTime.now().toIso8601String(),
       );
@@ -75,6 +90,8 @@ class _AddJournalScreenState extends State<AddJournalScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Gagal menyimpan catatan'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.redAccent,
           ),
         );
       }
@@ -91,16 +108,53 @@ class _AddJournalScreenState extends State<AddJournalScreen> {
     super.dispose();
   }
 
+  Color _getMoodColor(String mood) {
+    switch (mood.toLowerCase()) {
+      case 'senang':
+        return Colors.green[700]!;
+      case 'sedih':
+        return Colors.blue[700]!;
+      case 'marah':
+        return Colors.red[700]!;
+      case 'cemas':
+        return Colors.orange[700]!;
+      case 'tenang':
+        return Colors.teal[700]!;
+      default:
+        return Colors.grey[700]!;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor;
+    final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
+    
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.journal == null ? 'Tambah Catatan' : 'Edit Catatan'),
+        title: Text(
+          widget.journal == null ? 'Tambah Catatan' : 'Edit Catatan',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: _isLoading ? null : _saveJournal,
-          ),
+          _isLoading
+              ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 16.0),
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Color.fromARGB(255, 255, 0, 0),
+                      ),
+                    ),
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(Icons.check),
+                  onPressed: _saveJournal,
+                ),
         ],
       ),
       body: _isLoading
@@ -110,76 +164,187 @@ class _AddJournalScreenState extends State<AddJournalScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Tanggal',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  DateSelector(
-                    selectedDate: _selectedDate,
-                    onDateSelected: (date) {
-                      setState(() {
-                        _selectedDate = date;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Suasana Hati',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  MoodSelector(
-                    selectedMood: _selectedMood,
-                    moods: _moods,
-                    onMoodSelected: (mood) {
-                      setState(() {
-                        _selectedMood = mood;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Catatan',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _contentController,
-                    maxLines: 10,
-                    decoration: const InputDecoration(
-                      hintText: 'Tuliskan pikiran Anda di sini...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                  // Date section
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: scaffoldBackgroundColor.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.grey.withOpacity(0.2),
+                        width: 1,
                       ),
-                      contentPadding: EdgeInsets.all(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today,
+                              color: primaryColor,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Tanggal',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        DateSelector(
+                          selectedDate: _selectedDate,
+                          onDateSelected: (date) {
+                            setState(() {
+                              _selectedDate = date;
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ),
+                  
                   const SizedBox(height: 20),
+                  
+                  // Mood section
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: scaffoldBackgroundColor.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.grey.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.emoji_emotions,
+                              color: primaryColor,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Suasana Hati',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        MoodSelector(
+                          selectedMood: _selectedMood,
+                          moods: _moods,
+                          onMoodSelected: (mood) {
+                            setState(() {
+                              _selectedMood = mood;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Content section
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: scaffoldBackgroundColor.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.grey.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.edit_note,
+                              color: primaryColor,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Catatan',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _contentController,
+                          maxLines: 10,
+                          style: const TextStyle(fontSize: 16, height: 1.5),
+                          decoration: InputDecoration(
+                            hintText: 'Tuliskan pikiran dan perasaan Anda di sini...',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Colors.grey.withOpacity(0.3),
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Colors.grey.withOpacity(0.3),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: primaryColor,
+                                width: 1.5,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.all(16),
+                            filled: true,
+                            fillColor: Colors.grey.withOpacity(0.05),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Save button
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
+                    height: 54,
                     child: ElevatedButton(
                       onPressed: _saveJournal,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
+                        backgroundColor: primaryColor,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        elevation: 2,
                       ),
-                      child: const Text(
-                        'Simpan Catatan',
-                        style: TextStyle(fontSize: 16),
+                      child: Text(
+                        widget.journal == null ? 'Simpan Catatan' : 'Perbarui Catatan',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),

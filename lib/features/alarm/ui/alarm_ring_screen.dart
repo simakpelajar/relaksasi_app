@@ -171,24 +171,26 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> with SingleTickerProv
                 style: const TextStyle(
                   fontSize: 72,
                   fontWeight: FontWeight.bold,
+                  color: Colors.black
                 ),
               ),
               Text(
                 'Fri, $day $month',
                 style: TextStyle(
                   fontSize: 18,
-                  color: Colors.grey[600],
+                  color: const Color.fromARGB(255, 30, 29, 29),
                 ),
               ),
               const Spacer(flex: 1),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Text(
-                  'Waktunya Meditasi\n$_title',
+                  'Waktunya Meditasi\n "$_title"',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    color: Colors.black
                   ),
                 ),
               ),
@@ -206,69 +208,9 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> with SingleTickerProv
               Stack(
                 alignment: Alignment.center,
                 children: [
-                  // Petunjuk teks minimalis kiri-kanan
-                  Positioned(
-                    left: 0,
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.blue.withOpacity(0.6),
-                          size: 18,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Kiri untuk",
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          "TUNDA",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.blue.shade600,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+            
                   
-                  Positioned(
-                    right: 0,
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.red.withOpacity(0.6),
-                          size: 18,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Kanan untuk",
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          "STOP",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.red.shade600,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  
+                 
                   // Container lingkaran utama
                   Container(
                     width: 200,
@@ -277,14 +219,14 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> with SingleTickerProv
                       shape: BoxShape.circle,
                       gradient: RadialGradient(
                         colors: [
-                          Colors.white,
-                          Color(0xFFEEF3FF),
+                          const Color.fromARGB(255, 128, 181, 250),
+                          const Color.fromARGB(255, 194, 194, 194).withOpacity(0.1),
                         ],
                         stops: const [0.7, 1.0],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: const Color.fromARGB(255, 25, 25, 25).withOpacity(0.05),
                           blurRadius: 15,
                           spreadRadius: 1,
                         ),
@@ -370,7 +312,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> with SingleTickerProv
                               child: Center(
                                 child: Icon(
                                   _getPositionIcon(),
-                                  color: Colors.white,
+                                  color: const Color.fromARGB(255, 74, 74, 74),
                                   size: 28,
                                 ),
                               ),
@@ -410,6 +352,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> with SingleTickerProv
                     '$_snoozeMinutes menit',
                     style: const TextStyle(
                       fontSize: 16,
+                      color: Colors.black,
                     ),
                   ),
                   IconButton(

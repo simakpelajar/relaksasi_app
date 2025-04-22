@@ -69,7 +69,7 @@ class _JournalScreenState extends State<JournalScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _journals.isEmpty
               ? EmptyJournalState(onCreateJournal: _navigateToAddJournal)
-              : _buildJournalList(),
+              : _buildJournalGrid(),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToAddJournal,
         backgroundColor: Theme.of(context).primaryColor,
@@ -78,29 +78,37 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _buildJournalList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _journals.length,
-      itemBuilder: (context, index) {
-        final journal = _journals[index];
-        
-        return JournalCard(
-          journal: journal,
-          onTap: () async {
-            final result = await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => JournalDetailScreen(journal: journal),
-              ),
-            );
+  Widget _buildJournalGrid() {
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.85,
+        ),
+        itemCount: _journals.length,
+        itemBuilder: (context, index) {
+          final journal = _journals[index];
+          
+          return JournalCard(
+            journal: journal,
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => JournalDetailScreen(journal: journal),
+                ),
+              );
 
-            if (result == true) {
-              _loadJournals();
-            }
-          },
-        );
-      },
+              if (result == true) {
+                _loadJournals();
+              }
+            },
+          );
+        },
+      ),
     );
   }
 }

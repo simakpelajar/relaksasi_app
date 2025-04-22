@@ -11,7 +11,7 @@ class MeditationHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Header yang sudah dikecilkan sedikit
+    // Header y
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -20,15 +20,15 @@ class MeditationHeader extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [
             Color(0xFF5263F3),
-            Color(0xFF6E7BFF),
+            Color.fromARGB(255, 9, 9, 9),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF5263F3).withOpacity(0.4),
+            color: const Color.fromARGB(106, 56, 18, 105).withOpacity(0.4),
             blurRadius: 20,
-            offset: const Offset(0, 10),
+            offset: const Offset(0, 0),
           ),
         ],
       ),

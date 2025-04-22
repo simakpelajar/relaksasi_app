@@ -3,37 +3,42 @@ import 'package:flutter/material.dart';
 class MoodIcon extends StatelessWidget {
   final String mood;
   final double size;
+  final Color? color;
 
   const MoodIcon({
     Key? key,
     required this.mood,
-    this.size = 40,
+    this.size = 24.0,
+    this.color,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: _getMoodColor(mood).withOpacity(0.2),
-        borderRadius: BorderRadius.circular(size / 2),
-        border: Border.all(
-          color: _getMoodColor(mood),
-          width: 1.5,
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          _getMoodIcon(mood),
-          color: _getMoodColor(mood),
-          size: size * 0.6,
-        ),
-      ),
+    return Icon(
+      _getMoodIcon(),
+      size: size,
+      color: color ?? _getMoodColor(),
     );
   }
 
-  Color _getMoodColor(String mood) {
+  IconData _getMoodIcon() {
+    switch (mood.toLowerCase()) {
+      case 'senang':
+        return Icons.sentiment_very_satisfied;
+      case 'sedih':
+        return Icons.sentiment_very_dissatisfied;
+      case 'marah':
+        return Icons.mood_bad;
+      case 'cemas':
+        return Icons.sentiment_neutral;
+      case 'tenang':
+        return Icons.sentiment_satisfied;
+      default:
+        return Icons.emoji_emotions;
+    }
+  }
+
+  Color _getMoodColor() {
     switch (mood.toLowerCase()) {
       case 'senang':
         return Colors.green;
@@ -48,17 +53,5 @@ class MoodIcon extends StatelessWidget {
       default:
         return Colors.grey;
     }
-  }
-
-  IconData _getMoodIcon(String mood) {
-    final Map<String, IconData> moodIcons = {
-      'Senang': Icons.sentiment_very_satisfied,
-      'Sedih': Icons.sentiment_dissatisfied,
-      'Marah': Icons.mood_bad,
-      'Cemas': Icons.sentiment_neutral,
-      'Tenang': Icons.sentiment_satisfied,
-    };
-    
-    return moodIcons[mood] ?? Icons.mood;
   }
 }

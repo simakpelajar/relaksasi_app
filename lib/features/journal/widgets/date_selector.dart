@@ -12,7 +12,6 @@ class DateSelector extends StatelessWidget {
   }) : super(key: key);
 
   Future<void> _selectDate(BuildContext context) async {
-    // Menggunakan DateTime.now().year + 1 untuk memastikan lastDate selalu mencakup tanggal saat ini
     final DateTime now = DateTime.now();
     final DateTime lastDate = DateTime(now.year + 1, 12, 31);
     
