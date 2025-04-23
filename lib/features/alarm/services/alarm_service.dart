@@ -108,16 +108,23 @@ class AlarmService {
         vibrate: true,
         warningNotificationOnKill: Platform.isAndroid,
         androidFullScreenIntent: true,
-        volumeSettings: alarm_package.VolumeSettings.fade(
-          volume: 1.0,
-          fadeDuration: const Duration(seconds: 2), // Lebih singkat untuk testing
-          volumeEnforced: true,
+        allowAlarmOverlap: true,
+        volumeSettings: alarm_package.VolumeSettings.staircaseFade(
+          volume: null, // null berarti menggunakan volume sistem
+          fadeSteps: [
+            alarm_package.VolumeFadeStep(Duration.zero, 0.1),
+            alarm_package.VolumeFadeStep(const Duration(seconds: 5), 0.3),
+            alarm_package.VolumeFadeStep(const Duration(seconds: 10), 0.5),
+            alarm_package.VolumeFadeStep(const Duration(seconds: 15), 0.7),
+            alarm_package.VolumeFadeStep(const Duration(seconds: 20), 1.0),
+          ],
+          volumeEnforced: false, // false berarti menghormati volume sistem
         ),
         notificationSettings: alarm_package.NotificationSettings(
-          title: 'Waktunya Meditasi',
+          title: 'Realaxa Alarm',
           body: alarm.title,
-          stopButton: 'Stop',
-          icon: 'notification_icon',
+          stopButton: 'Matikan',
+          icon: 'mipmap/ic_launcher',
           iconColor: const Color(0xff862778),
         ),
       );

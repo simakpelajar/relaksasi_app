@@ -21,10 +21,11 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> with SingleTickerProv
   // State untuk gesture slider
   bool _isDragging = false;
   Offset _position = Offset.zero;
-  double _dragThreshold = 70.0; // Jarak geser yang diperlukan untuk aksi
+  double _dragThreshold = 70.0;
   
-  // State untuk menentukan aksi yang akan dilakukan
-
+  // Optimasi dengan ValueNotifier untuk mengurangi rebuild
+  final ValueNotifier<double> _dragProgress = ValueNotifier<double>(0.0);
+  
   // State untuk animasi
   late AnimationController _pulseController;
 
@@ -33,16 +34,17 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> with SingleTickerProv
     super.initState();
     _title = widget.alarmSettings.notificationSettings?.body ?? 'Waktunya Meditasi';
     
-    // Inisialisasi animasi untuk efek pulsing pada lingkaran
+    // Optimasi animasi dengan lebih lambat untuk mengurangi beban
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
+      duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
   }
   
   @override
   void dispose() {
     _pulseController.dispose();
+    _dragProgress.dispose();
     super.dispose();
   }
 
@@ -208,9 +210,6 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> with SingleTickerProv
               Stack(
                 alignment: Alignment.center,
                 children: [
-            
-                  
-                 
                   // Container lingkaran utama
                   Container(
                     width: 200,
@@ -236,90 +235,91 @@ class _AlarmRingScreenState extends State<AlarmRingScreen> with SingleTickerProv
                         width: 2,
                       ),
                     ),
-                    child: GestureDetector(
-                      onPanStart: (details) {
-                        setState(() {
-                          _isDragging = true;
-                        });
-                      },
-                      onPanUpdate: (details) {
-                        setState(() {
-                          _position += details.delta;
-                          if (_calculateDragDistance() > 80) {
-                            _position = (_position / _calculateDragDistance()) * 80;
-                          }
-                        });
-                      },
-                      onPanEnd: (details) {
-                        if (_calculateDragDistance() > _dragThreshold * 0.7) {
-                          _executeAction();
-                        } else {
-                          // Animasi kembali ke posisi awal jika tidak mencapai threshold
-                          setState(() {
-                            _isDragging = false;
-                            _position = Offset.zero;
-                          });
-                        }
-                      },
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          // Lingkaran pulsating outer
-                          AnimatedBuilder(
-                            animation: _pulseController,
-                            builder: (context, child) {
-                              return Container(
-                                width: 120 + _pulseController.value * 10,
-                                height: 120 + _pulseController.value * 10,
+                    child: ValueListenableBuilder<double>(
+                      valueListenable: _dragProgress,
+                      builder: (context, progress, child) {
+                        return GestureDetector(
+                          onPanStart: (details) {
+                            _isDragging = true;
+                            _dragProgress.value = 0;
+                          },
+                          onPanUpdate: (details) {
+                            _position += details.delta;
+                            if (_calculateDragDistance() > 80) {
+                              _position = (_position / _calculateDragDistance()) * 80;
+                            }
+                            _dragProgress.value = _calculateDragPercentage();
+                          },
+                          onPanEnd: (details) {
+                            if (_calculateDragDistance() > _dragThreshold * 0.7) {
+                              _executeAction();
+                            } else {
+                              _isDragging = false;
+                              _position = Offset.zero;
+                              _dragProgress.value = 0;
+                            }
+                          },
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              // Lingkaran pulsating outer
+                              AnimatedBuilder(
+                                animation: _pulseController,
+                                builder: (context, child) {
+                                  return Container(
+                                    width: 120 + _pulseController.value * 10,
+                                    height: 120 + _pulseController.value * 10,
+                                    decoration: BoxDecoration(
+                                      color: positionColor.withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  );
+                                },
+                              ),
+                              // Indikator kemajuan geseran
+                              AnimatedContainer(
+                                duration: const Duration(milliseconds: 100),
+                                width: 100,
+                                height: 100,
                                 decoration: BoxDecoration(
-                                  color: positionColor.withOpacity(0.1),
+                                  color: positionColor.withOpacity(0.2),
                                   shape: BoxShape.circle,
                                 ),
-                              );
-                            },
-                          ),
-                          // Indikator kemajuan geseran
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 100),
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: positionColor.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          // Lingkaran yang dapat digeser
-                          Transform.translate(
-                            offset: _position,
-                            child: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: positionColor,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  // Drop shadow dengan blur 50 sesuai arah geseran (kiri/kanan)
-                                  BoxShadow(
-                                    color: _isRightSide() 
-                                      ? Colors.red.withOpacity(_calculateDragPercentage() * 0.7) 
-                                      : Colors.blue.withOpacity(_calculateDragPercentage() * 0.7),
-                                    blurRadius: 50,
-                                    spreadRadius: 5,
-                                    offset: const Offset(0, 0), // Posisi bayangan tepat di tengah
-                                  )
-                                ],
                               ),
-                              child: Center(
-                                child: Icon(
-                                  _getPositionIcon(),
-                                  color: const Color.fromARGB(255, 74, 74, 74),
-                                  size: 28,
+                              // Lingkaran yang dapat digeser
+                              Transform.translate(
+                                offset: _position,
+                                child: Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    color: positionColor,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      // Drop shadow dengan blur 50 sesuai arah geseran (kiri/kanan)
+                                      BoxShadow(
+                                        color: _isRightSide() 
+                                          ? Colors.red.withOpacity(_calculateDragPercentage() * 0.7) 
+                                          : Colors.blue.withOpacity(_calculateDragPercentage() * 0.7),
+                                        blurRadius: 50,
+                                        spreadRadius: 5,
+                                        offset: const Offset(0, 0), // Posisi bayangan tepat di tengah
+                                      )
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      _getPositionIcon(),
+                                      color: const Color.fromARGB(255, 74, 74, 74),
+                                      size: 28,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ],

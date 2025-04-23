@@ -3,6 +3,7 @@ import 'package:relax_fik/core/utils/date_formatter.dart';
 import 'package:relax_fik/features/journal/models/journal_model.dart';
 import 'package:relax_fik/features/journal/services/journal_service.dart';
 import 'package:relax_fik/features/journal/widgets/date_selector.dart';
+import 'package:relax_fik/features/journal/widgets/form_section_container.dart';
 import 'package:relax_fik/features/journal/widgets/mood_selector.dart';
 
 class AddJournalScreen extends StatefulWidget {
@@ -108,27 +109,9 @@ class _AddJournalScreenState extends State<AddJournalScreen> {
     super.dispose();
   }
 
-  Color _getMoodColor(String mood) {
-    switch (mood.toLowerCase()) {
-      case 'senang':
-        return Colors.green[700]!;
-      case 'sedih':
-        return Colors.blue[700]!;
-      case 'marah':
-        return Colors.red[700]!;
-      case 'cemas':
-        return Colors.orange[700]!;
-      case 'tenang':
-        return Colors.teal[700]!;
-      default:
-        return Colors.grey[700]!;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).primaryColor;
-    final scaffoldBackgroundColor = Theme.of(context).scaffoldBackgroundColor;
     
     return Scaffold(
       appBar: AppBar(
@@ -165,164 +148,71 @@ class _AddJournalScreenState extends State<AddJournalScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Date section
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: scaffoldBackgroundColor.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.grey.withOpacity(0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              color: primaryColor,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Tanggal',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        DateSelector(
-                          selectedDate: _selectedDate,
-                          onDateSelected: (date) {
-                            setState(() {
-                              _selectedDate = date;
-                            });
-                          },
-                        ),
-                      ],
+                  FormSectionContainer(
+                    icon: Icons.calendar_today,
+                    title: 'Tanggal',
+                    child: DateSelector(
+                      selectedDate: _selectedDate,
+                      onDateSelected: (date) {
+                        setState(() {
+                          _selectedDate = date;
+                        });
+                      },
                     ),
                   ),
                   
                   const SizedBox(height: 20),
                   
                   // Mood section
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: scaffoldBackgroundColor.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.grey.withOpacity(0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.emoji_emotions,
-                              color: primaryColor,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Suasana Hati',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        MoodSelector(
-                          selectedMood: _selectedMood,
-                          moods: _moods,
-                          onMoodSelected: (mood) {
-                            setState(() {
-                              _selectedMood = mood;
-                            });
-                          },
-                        ),
-                      ],
+                  FormSectionContainer(
+                    icon: Icons.emoji_emotions,
+                    title: 'Suasana Hati',
+                    child: MoodSelector(
+                      selectedMood: _selectedMood,
+                      moods: _moods,
+                      onMoodSelected: (mood) {
+                        setState(() {
+                          _selectedMood = mood;
+                        });
+                      },
                     ),
                   ),
                   
                   const SizedBox(height: 20),
                   
                   // Content section
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: scaffoldBackgroundColor.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.grey.withOpacity(0.2),
-                        width: 1,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.edit_note,
-                              color: primaryColor,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Catatan',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: primaryColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        TextField(
-                          controller: _contentController,
-                          maxLines: 10,
-                          style: const TextStyle(fontSize: 16, height: 1.5),
-                          decoration: InputDecoration(
-                            hintText: 'Tuliskan pikiran dan perasaan Anda di sini...',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.grey.withOpacity(0.3),
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: Colors.grey.withOpacity(0.3),
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(
-                                color: primaryColor,
-                                width: 1.5,
-                              ),
-                            ),
-                            contentPadding: const EdgeInsets.all(16),
-                            filled: true,
-                            fillColor: Colors.grey.withOpacity(0.05),
+                  FormSectionContainer(
+                    icon: Icons.edit_note,
+                    title: 'Catatan',
+                    child: TextField(
+                      controller: _contentController,
+                      maxLines: 10,
+                      style: const TextStyle(fontSize: 16, height: 1.5),
+                      decoration: InputDecoration(
+                        hintText: 'Tuliskan pikiran dan perasaan Anda di sini...',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.grey.withOpacity(0.3),
                           ),
                         ),
-                      ],
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.grey.withOpacity(0.3),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: primaryColor,
+                            width: 1.5,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.all(16),
+                        filled: true,
+                        fillColor: Colors.grey.withOpacity(0.05),
+                      ),
                     ),
                   ),
                   

@@ -8,9 +8,16 @@ import 'package:alarm/alarm.dart';
 // import 'package:relax_fik/features/alarm/services/alarm_service.dart';
 import 'package:relax_fik/features/alarm/ui/alarm_ring_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:relax_fik/features/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Set orientasi portrait only
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   
   // Inisialisasi data lokalisasi untuk bahasa Indonesia
   await initializeDateFormatting('id_ID', null);
@@ -59,7 +66,11 @@ class MyApp extends StatelessWidget {
       title: 'relax_fik APP',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const HomeScreen(),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/home': (context) => const HomeScreen(),
+      },
       navigatorKey: navigatorKey,
     );
   }

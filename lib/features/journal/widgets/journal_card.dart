@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:relax_fik/core/theme/app_theme.dart';
 import 'package:relax_fik/features/journal/models/journal_model.dart';
-import 'package:relax_fik/features/journal/widgets/mood_icon.dart';
+import 'package:relax_fik/features/journal/utils/mood_utils.dart';
 
 class JournalCard extends StatelessWidget {
   final Journal journal;
@@ -13,48 +12,6 @@ class JournalCard extends StatelessWidget {
     required this.onTap,
   }) : super(key: key);
 
-  // Get gradient based on mood
-  LinearGradient _getGradientForMood(String mood) {
-    switch (mood.toLowerCase()) {
-      case 'senang':
-        return LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.blue[800]!, Colors.blue[400]!],
-        );
-      case 'sedih':
-        return LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.indigo[900]!, Colors.indigo[400]!],
-        );
-      case 'marah':
-        return LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.red[900]!, Colors.red[400]!],
-        );
-      case 'cemas':
-        return LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.orange[900]!, Colors.orange[400]!],
-        );
-      case 'tenang':
-        return LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.teal[800]!, Colors.teal[400]!],
-        );
-      default:
-        return LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: AppTheme.meditationGradients[0],
-        );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -62,7 +19,7 @@ class JournalCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-          gradient: _getGradientForMood(journal.mood),
+          gradient: MoodUtils.getGradientForMood(journal.mood),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -119,7 +76,7 @@ class JournalCard extends StatelessWidget {
                             children: [
                               Icon(Icons.calendar_today, 
                                 size: 14, 
-                                color: _getMoodColor(journal.mood),
+                                color: MoodUtils.getMoodColor(journal.mood),
                               ),
                               const SizedBox(width: 4),
                               Text(
@@ -127,7 +84,7 @@ class JournalCard extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: _getMoodColor(journal.mood),
+                                  color: MoodUtils.getMoodColor(journal.mood),
                                 ),
                               ),
                             ],
@@ -146,7 +103,11 @@ class JournalCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: MoodIcon(mood: journal.mood, size: 30),
+                          child: Icon(
+                            MoodUtils.getMoodIcon(journal.mood),
+                            size: 30,
+                            color: MoodUtils.getMoodColor(journal.mood),
+                          ),
                         ),
                       ],
                     ),
@@ -172,9 +133,9 @@ class JournalCard extends StatelessWidget {
                             color: Colors.white.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Row(
+                          child: const Row(
                             children: [
-                              const Text(
+                              Text(
                                 'Baca',
                                 style: TextStyle(
                                   fontSize: 12,
@@ -182,8 +143,8 @@ class JournalCard extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(width: 4),
-                              const Icon(
+                              SizedBox(width: 4),
+                              Icon(
                                 Icons.arrow_forward_ios,
                                 size: 12,
                                 color: Colors.white,
@@ -201,22 +162,5 @@ class JournalCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _getMoodColor(String mood) {
-    switch (mood.toLowerCase()) {
-      case 'senang':
-        return Colors.green[700]!;
-      case 'sedih':
-        return Colors.blue[700]!;
-      case 'marah':
-        return Colors.red[700]!;
-      case 'cemas':
-        return Colors.orange[700]!;
-      case 'tenang':
-        return Colors.teal[700]!;
-      default:
-        return Colors.grey[700]!;
-    }
   }
 }

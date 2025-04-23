@@ -1,6 +1,3 @@
-// lib/features/meditation/data/meditation_database.dart
-
-
 import '../../../../core/database/database_helper.dart';
 
 class MeditationDatabase {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:relax_fik/features/journal/utils/mood_utils.dart';
 
 class MoodSelector extends StatelessWidget {
   final String selectedMood;
@@ -24,7 +25,7 @@ class MoodSelector extends StatelessWidget {
         itemBuilder: (context, index) {
           final mood = moods[index];
           final isSelected = mood == selectedMood;
-          final moodColor = _getMoodColor(mood);
+          final moodColor = MoodUtils.getMoodColor(mood);
           
           return GestureDetector(
             onTap: () => onMoodSelected(mood),
@@ -43,7 +44,7 @@ class MoodSelector extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    _getMoodIcon(mood),
+                    MoodUtils.getMoodIcon(mood),
                     color: moodColor,
                     size: 32,
                   ),
@@ -62,34 +63,5 @@ class MoodSelector extends StatelessWidget {
         },
       ),
     );
-  }
-
-  Color _getMoodColor(String mood) {
-    switch (mood.toLowerCase()) {
-      case 'senang':
-        return Colors.green;
-      case 'sedih':
-        return Colors.blue;
-      case 'marah':
-        return Colors.red;
-      case 'cemas':
-        return Colors.orange;
-      case 'tenang':
-        return Colors.teal;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  IconData _getMoodIcon(String mood) {
-    final Map<String, IconData> moodIcons = {
-      'Senang': Icons.sentiment_very_satisfied,
-      'Sedih': Icons.sentiment_dissatisfied,
-      'Marah': Icons.mood_bad,
-      'Cemas': Icons.sentiment_neutral,
-      'Tenang': Icons.sentiment_satisfied,
-    };
-    
-    return moodIcons[mood] ?? Icons.mood;
   }
 }

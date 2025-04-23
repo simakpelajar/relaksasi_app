@@ -5,6 +5,7 @@ import 'package:relax_fik/features/journal/ui/add_journal_screen.dart';
 import 'package:relax_fik/features/journal/ui/journal_detail_screen.dart';
 import 'package:relax_fik/features/journal/widgets/empty_journal_state.dart';
 import 'package:relax_fik/features/journal/widgets/journal_card.dart';
+import 'package:relax_fik/features/journal/widgets/journal_grid.dart';
 
 class JournalScreen extends StatefulWidget {
   const JournalScreen({Key? key}) : super(key: key);
@@ -53,6 +54,19 @@ class _JournalScreenState extends State<JournalScreen> {
     }
   }
 
+  Future<void> _navigateToJournalDetail(Journal journal) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => JournalDetailScreen(journal: journal),
+      ),
+    );
+
+    if (result == true) {
+      _loadJournals();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,45 +83,14 @@ class _JournalScreenState extends State<JournalScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _journals.isEmpty
               ? EmptyJournalState(onCreateJournal: _navigateToAddJournal)
-              : _buildJournalGrid(),
+              : JournalGrid(
+                  journals: _journals,
+                  onJournalTap: _navigateToJournalDetail,
+                ),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToAddJournal,
         backgroundColor: Theme.of(context).primaryColor,
         child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  Widget _buildJournalGrid() {
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.85,
-        ),
-        itemCount: _journals.length,
-        itemBuilder: (context, index) {
-          final journal = _journals[index];
-          
-          return JournalCard(
-            journal: journal,
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => JournalDetailScreen(journal: journal),
-                ),
-              );
-
-              if (result == true) {
-                _loadJournals();
-              }
-            },
-          );
-        },
       ),
     );
   }

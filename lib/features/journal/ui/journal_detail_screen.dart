@@ -3,7 +3,7 @@ import 'package:relax_fik/core/theme/app_theme.dart';
 import 'package:relax_fik/features/journal/models/journal_model.dart';
 import 'package:relax_fik/features/journal/services/journal_service.dart';
 import 'package:relax_fik/features/journal/ui/add_journal_screen.dart';
-import 'package:relax_fik/features/journal/widgets/mood_icon.dart';
+import 'package:relax_fik/features/journal/utils/mood_utils.dart';
 
 class JournalDetailScreen extends StatefulWidget {
   final Journal journal;
@@ -76,7 +76,6 @@ class _JournalDetailScreenState extends State<JournalDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final primaryColor = AppTheme.primaryColor;
-    final scaffoldBackgroundColor = AppTheme.backgroundColor;
     
     return Scaffold(
       appBar: AppBar(
@@ -163,7 +162,7 @@ class _JournalDetailScreenState extends State<JournalDetailScreen> {
                             ),
                           ],
                         ),
-                       Container(
+                        Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 10,
@@ -179,31 +178,30 @@ class _JournalDetailScreenState extends State<JournalDetailScreen> {
                               ),
                             ],
                             border: Border.all(
-                              color: _getMoodColor(widget.journal.mood).withOpacity(0.5),
+                              color: MoodUtils.getMoodColor(widget.journal.mood).withOpacity(0.5),
                               width: 1.5,
                             ),
                           ),
                           child: Row(
                             children: [
-                              MoodIcon(
-                                mood: widget.journal.mood,
+                              Icon(
+                                MoodUtils.getMoodIcon(widget.journal.mood),
                                 size: 24,
+                                color: MoodUtils.getMoodColor(widget.journal.mood),
                               ),
                               const SizedBox(width: 8),
                               Text(
                                 widget.journal.mood,
                                 style: TextStyle(
-                                  color: _getMoodColor(widget.journal.mood),
+                                  color: MoodUtils.getMoodColor(widget.journal.mood),
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ],
                           ),
-                       ),
-
+                        ),
                       ],
-                      
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -253,15 +251,13 @@ class _JournalDetailScreenState extends State<JournalDetailScreen> {
                         ),
                       ],
                     ),
-                  ),
-                  
+                  ),            
                   const SizedBox(height: 24),
-                  
-                  // Additional information card
+
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: _getMoodColor(widget.journal.mood).withOpacity(0.15),
+                      color: MoodUtils.getMoodColor(widget.journal.mood).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: Colors.white.withOpacity(0.3),
@@ -272,9 +268,9 @@ class _JournalDetailScreenState extends State<JournalDetailScreen> {
                       children: [
                         CircleAvatar(
                           radius: 24,
-                          backgroundColor: _getMoodColor(widget.journal.mood).withOpacity(0.3),
+                          backgroundColor: MoodUtils.getMoodColor(widget.journal.mood).withOpacity(0.3),
                           child: Icon(
-                            _getMoodIcon(widget.journal.mood),
+                            MoodUtils.getMoodIcon(widget.journal.mood),
                             color: Colors.white,
                             size: 24,
                           ),
@@ -285,7 +281,7 @@ class _JournalDetailScreenState extends State<JournalDetailScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _getMoodDescription(widget.journal.mood),
+                                MoodUtils.getMoodDescription(widget.journal.mood),
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -294,7 +290,7 @@ class _JournalDetailScreenState extends State<JournalDetailScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _getMoodAdvice(widget.journal.mood),
+                                MoodUtils.getMoodAdvice(widget.journal.mood),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: AppTheme.textColor,
@@ -310,73 +306,5 @@ class _JournalDetailScreenState extends State<JournalDetailScreen> {
               ),
             ),
     );
-  }
-
-  IconData _getMoodIcon(String mood) {
-    switch (mood.toLowerCase()) {
-      case 'senang':
-        return Icons.sentiment_very_satisfied;
-      case 'sedih':
-        return Icons.sentiment_very_dissatisfied;
-      case 'marah':
-        return Icons.mood_bad;
-      case 'cemas':
-        return Icons.sentiment_neutral;
-      case 'tenang':
-        return Icons.sentiment_satisfied;
-      default:
-        return Icons.emoji_emotions;
-    }
-  }
-  
-  String _getMoodDescription(String mood) {
-    switch (mood.toLowerCase()) {
-      case 'senang':
-        return 'Anda merasa senang hari ini';
-      case 'sedih':
-        return 'Anda merasa sedih hari ini';
-      case 'marah':
-        return 'Anda merasa marah hari ini';
-      case 'cemas':
-        return 'Anda merasa cemas hari ini';
-      case 'tenang':
-        return 'Anda merasa tenang hari ini';
-      default:
-        return 'Bagaimana perasaan Anda hari ini?';
-    }
-  }
-  
-  String _getMoodAdvice(String mood) {
-    switch (mood.toLowerCase()) {
-      case 'senang':
-        return 'Bagus! Teruslah pertahankan energi positif ini.';
-      case 'sedih':
-        return 'Cobalah meditasi atau aktivitas yang Anda sukai.';
-      case 'marah':
-        return 'Tarik nafas dalam dan coba tenangkan pikiran Anda.';
-      case 'cemas':
-        return 'Latihan pernapasan bisa membantu mengurangi kecemasan.';
-      case 'tenang':
-        return 'Sempurna, tetap jaga keseimbangan pikiran Anda.';
-      default:
-        return 'Tuliskan perasaan Anda setiap hari untuk refleksi diri.';
-    }
-  }
-
-  Color _getMoodColor(String mood) {
-    switch (mood.toLowerCase()) {
-      case 'senang':
-        return Colors.green;
-      case 'sedih':
-        return Colors.blue;
-      case 'marah':
-        return Colors.red;
-      case 'cemas':
-        return Colors.orange;
-      case 'tenang':
-        return Colors.teal;
-      default:
-        return Colors.grey;
-    }
   }
 }
